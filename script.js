@@ -19,9 +19,9 @@ const GAME_OPTIONS = {
 };
 
 const CHOICES = {
-    pedra: { emoji: '👊', name: 'Pedra', beats: 'tesoura' },
-    papel: { emoji: '🖐️', name: 'Papel', beats: 'pedra' },
-    tesoura: { emoji: '✌️', name: 'Tesoura', beats: 'papel' }
+    pedra: { emoji: '👊', name: 'Pedra', beats: 'tesoura', color: '#a200ff' },
+    papel: { emoji: '🖐️', name: 'Papel', beats: 'pedra', color: '#9ee01a' },
+    tesoura: { emoji: '✌️', name: 'Tesoura', beats: 'papel', color: '#7dbeed' }
 };
 
 const playMachine = () => {
@@ -42,6 +42,11 @@ const playHuman = (humanChoice) => {
     machineChoiceLabel.textContent = 'Preparando…';
     result.dataset.outcome = '';
     result.textContent = 'Pedra…';
+    // Volta às cores neutras do CSS durante a animação.
+    humanHand.parentElement.style.backgroundColor = '';
+    machineHand.parentElement.style.backgroundColor = '';
+    humanHand.parentElement.style.color = '';
+    machineHand.parentElement.style.color = '';
     arena.classList.add('is-playing');
 
     // A contagem acompanha as mãos antes de revelar as jogadas.
@@ -53,6 +58,12 @@ const playHuman = (humanChoice) => {
         machineHand.textContent = CHOICES[machineChoice].emoji;
         humanChoiceLabel.textContent = CHOICES[humanChoice].name;
         machineChoiceLabel.textContent = CHOICES[machineChoice].name;
+
+        // Cada cartão recebe a mesma cor do botão da jogada escolhida.
+        humanHand.parentElement.style.backgroundColor = CHOICES[humanChoice].color;
+        machineHand.parentElement.style.backgroundColor = CHOICES[machineChoice].color;
+        humanHand.parentElement.style.color = humanChoice === 'pedra' ? '#fff' : '#111';
+        machineHand.parentElement.style.color = machineChoice === 'pedra' ? '#fff' : '#111';
 
         playTheGame(humanChoice, machineChoice);
         isPlaying = false;
