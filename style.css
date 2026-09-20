@@ -5,29 +5,29 @@
 }
 
 body {
-    background: url('https://picsum.photos/1920/1080');
-    background-size: cover;
+    background: #e9edf3 url('https://picsum.photos/1920/1080') center / cover;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    padding: 16px;
 }
 
 .container {
-    padding: 20px;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 430px;
     background: #ffffff;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 10px 35px #0002;
 }
 
-.buttons {
-    margin: 30px 0;
-    display: flex;
-    gap: 20px;
-}
+.hint { margin-top: 8px; color: #555; }
+.buttons { margin: 20px 0 24px; display: flex; gap: 20px; }
 
 button {
     padding: 10px;
@@ -35,36 +35,61 @@ button {
     cursor: pointer;
     border: none;
     border-radius: 100000px;
-    transition: opacity 0.5s ease-in-out;
-
+    transition: opacity 0.2s ease-in-out;
 }
 
-button:hover {
-    opacity: 0.7;
+button:hover:not(:disabled) { opacity: 0.7; }
+button:focus-visible { outline: 3px solid #222; outline-offset: 4px; }
+button:disabled { opacity: 0.45; cursor: wait; }
+#pedra { background-color: #a200ff; }
+#papel { background-color: #9ee01a; }
+#tesoura { background-color: #7dbeed; }
+
+/* Um cartão para cada jogador, com espaço fixo para a animação. */
+.arena {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.choice-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 155px;
+    padding: 12px 4px;
+    background: #f4f5f8;
+    border-radius: 12px;
+    text-align: center;
+}
+.hand { display: block; font-size: 52px; line-height: 1.3; }
+.versus { font-size: 28px; color: #666; text-align: center; }
+.is-playing .hand { animation: shake-hand 0.45s ease-in-out infinite; }
+
+@keyframes shake-hand {
+    0%, 100% { transform: translateY(0) rotate(-12deg); }
+    50% { transform: translateY(-12px) rotate(12deg); }
 }
 
-#pedra {
-    background-color: #a200ff;
+p { font-weight: bold; margin-bottom: 10px; }
+.result { min-height: 48px; text-align: center; line-height: 1.5; }
+.result[data-outcome="win"] { color: #18743a; }
+.result[data-outcome="loss"] { color: #b42323; }
+.result[data-outcome="draw"] { color: #62501a; }
+.your-score span { color: rgb(25, 25, 253); }
+.machine-score span { color: rgb(221, 17, 17); }
 
+@media (max-width: 380px) {
+    .buttons { gap: 12px; }
+    button { font-size: 40px; }
+    .hand { font-size: 44px; }
 }
 
-#papel {
-    background-color: #9ee01a;
-}
-
-#tesoura {
-    background-color: #7dbeed;
-}
-
-p {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.your-score span {
-    color: rgb(25, 25, 253);
-}
-
-.machine-score span {
-    color: rgb(221, 17, 17);
+@media (prefers-reduced-motion: reduce) {
+    .is-playing .hand { animation: none; }
+    button { transition: none; }
 }

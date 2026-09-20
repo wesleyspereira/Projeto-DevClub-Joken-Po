@@ -1,42 +1,81 @@
-const result = document.querySelector('.result')
-const humanScore = document.querySelector('#human-score')
-const machineScore = document.querySelector('#machine-score')
+const result = document.querySelector('.result');
+const humanScore = document.querySelector('#human-score');
+const machineScore = document.querySelector('#machine-score');
+const humanHand = document.querySelector('#human-hand');
+const machineHand = document.querySelector('#machine-hand');
+const humanChoiceLabel = document.querySelector('#human-choice');
+const machineChoiceLabel = document.querySelector('#machine-choice');
+const arena = document.querySelector('.arena');
+const buttons = document.querySelectorAll('.btn');
 
 let humanScoreNumber = 0;
 let machineScoreNumber = 0;
+let isPlaying = false;
 
 const GAME_OPTIONS = {
     ROCK: 'pedra',
     PAPER: 'papel',
     SCISSORS: 'tesoura'
-}
+};
 
+const CHOICES = {
+    pedra: { emoji: '👊', name: 'Pedra', beats: 'tesoura' },
+    papel: { emoji: '🖐️', name: 'Papel', beats: 'pedra' },
+    tesoura: { emoji: '✌️', name: 'Tesoura', beats: 'papel' }
+};
 
-const playHuman = (humanchoice) => {
-    playTheGame(humanchoice, playMachine())
-}
 const playMachine = () => {
-    const choices = [GAME_OPTIONS.ROCK, GAME_OPTIONS.PAPER, GAME_OPTIONS.SCISSORS];
-    const randomNunber = Math.floor(Math.random() * 3);
-    return choices[randomNunber]
-}
-const playTheGame = (humanchoice, machinechoice) => {
-    console.log('Humano:' + humanchoice + ' Maquina:' + machinechoice)
+    const choices = Object.values(GAME_OPTIONS);
+    return choices[Math.floor(Math.random() * choices.length)];
+};
 
-    if (humanchoice === machinechoice) {
-        result.innerHTML = 'Deu empate!'
-    }
-    else if (humanchoice === GAME_OPTIONS.ROCK && machinechoice === GAME_OPTIONS.SCISSORS ||
-        humanchoice === GAME_OPTIONS.PAPER && machinechoice === GAME_OPTIONS.ROCK ||
-        humanchoice === GAME_OPTIONS.SCISSORS && machinechoice === GAME_OPTIONS.PAPER) {
+const playHuman = (humanChoice) => {
+    // Impede cliques extras de iniciar rodadas durante a animação.
+    if (isPlaying || !Object.hasOwn(CHOICES, humanChoice)) return;
+    isPlaying = true;
+    buttons.forEach(button => { button.disabled = true; });
 
-        humanScoreNumber++
-        humanScore.innerHTML = humanScoreNumber
-        result.innerHTML = 'Você ganhou!'
+    const machineChoice = playMachine();
+    humanHand.textContent = '👊';
+    machineHand.textContent = '👊';
+    humanChoiceLabel.textContent = 'Preparando…';
+    machineChoiceLabel.textContent = 'Preparando…';
+    result.dataset.outcome = '';
+    result.textContent = 'Pedra…';
+    arena.classList.add('is-playing');
+
+    // A contagem acompanha as mãos antes de revelar as jogadas.
+    setTimeout(() => { result.textContent = 'Papel…'; }, 450);
+    setTimeout(() => { result.textContent = 'Tesoura!'; }, 900);
+    setTimeout(() => {
+        arena.classList.remove('is-playing');
+        humanHand.textContent = CHOICES[humanChoice].emoji;
+        machineHand.textContent = CHOICES[machineChoice].emoji;
+        humanChoiceLabel.textContent = CHOICES[humanChoice].name;
+        machineChoiceLabel.textContent = CHOICES[machineChoice].name;
+
+        playTheGame(humanChoice, machineChoice);
+        isPlaying = false;
+        buttons.forEach(button => { button.disabled = false; });
+    }, 1350);
+};
+
+const playTheGame = (humanChoice, machineChoice) => {
+    let message;
+    if (humanChoice === machineChoice) {
+        message = 'Deu empate!';
+        result.dataset.outcome = 'draw';
+    } else if (CHOICES[humanChoice].beats === machineChoice) {
+        humanScoreNumber++;
+        humanScore.textContent = humanScoreNumber;
+        message = 'Você ganhou!';
+        result.dataset.outcome = 'win';
+    } else {
+        machineScoreNumber++;
+        machineScore.textContent = machineScoreNumber;
+        message = 'A CPU ganhou!';
+        result.dataset.outcome = 'loss';
     }
-    else {
-        machineScoreNumber++
-        machineScore.innerHTML = machineScoreNumber
-        result.innerHTML = 'Você perdeu para Alexa!'
-    }
-}
+
+    result.textContent = `Você: ${CHOICES[humanChoice].name} · CPU: ${CHOICES[machineChoice].name}. ${message}`;
+};
